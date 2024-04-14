@@ -11,7 +11,7 @@ from celery.schedules import crontab
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(crontab(hour=11, minute=30), unanswered_ticket_notification.s(), name='Daily Unanswered Ticket Reminder')
     sender.add_periodic_task(crontab(minute=30, hour=4, day=1), poor_resolution_time.s(), name='Monthly Agent Resolution Time Report')
-
+    sender.add_periodic_task(crontab(minute=0,hour="*",day="*"), notify_google_chat.s(), name='Hourly Google Chat Notification')
 
 @celery.task()
 def poor_resolution_time():

@@ -1149,8 +1149,6 @@ class DiscoursePost(Resource):
                     topic_id = resp["topic_id"]
                 if resp["topic_slug"]:
                     topic_slug = resp["topic_slug"]
-                if resp["display_username"]:
-                    display_username = resp["display_username"]
                 if resp["created_at"]:
                     created_at = resp["created_at"]
                 if resp["updated_at"]:
@@ -1238,7 +1236,7 @@ class DiscoursePost(Resource):
                 if resp["mentioned_users"]:
                     mentioned_users = resp["mentioned_users"]
                     
-                new_discourse_post = DiscoursePost(post_id = post_id, topic_id = topic_id, topic_slug = topic_slug, display_username = display_username, created_at = created_at, updated_at = updated_at, cooked = cooked, reply_count = reply_count, reply_to_post_number = reply_to_post_number, quote_count = quote_count, incoming_link_count = incoming_link_count, reads = reads, readers_count = readers_count, score = score, yours = yours, primary_group_name = primary_group_name, flair_name = flair_name, flair_url = flair_url, flair_bg_color = flair_bg_color, flair_color = flair_color, flair_group_id = flair_group_id, version = version, can_edit = can_edit, can_delete = can_delete, can_recover = can_recover, can_see_hidden_post = can_see_hidden_post, can_wiki = can_wiki, user_title = user_title, bookmarked = bookmarked, actions_summary = actions_summary, moderator = moderator, admin = admin, staff = staff, user_id = user_id, draft_sequence = draft_sequence, hidden = hidden, trust_level = trust_level, deleted_at = deleted_at, user_deleted = user_deleted, edit_reason = edit_reason, can_view_edit_history = can_view_edit_history, wiki = wiki, reviewable_id = reviewable_id, reviewable_score_count = reviewable_score_count, reviewable_score_pending_count = reviewable_score_pending_count, mentioned_users = mentioned_users)
+                new_discourse_post = DiscoursePost(post_id = post_id, topic_id = topic_id, topic_slug = topic_slug, username = User.discourse_username, created_at = created_at, updated_at = updated_at, cooked = cooked, reply_count = reply_count, reply_to_post_number = reply_to_post_number, quote_count = quote_count, incoming_link_count = incoming_link_count, reads = reads, readers_count = readers_count, score = score, yours = yours, display_username = display_username, primary_group_name = primary_group_name, flair_name = flair_name, flair_url = flair_url, flair_bg_color = flair_bg_color, flair_color = flair_color, flair_group_id = flair_group_id, version = version, can_edit = can_edit, can_delete = can_delete, can_recover = can_recover, can_see_hidden_post = can_see_hidden_post, can_wiki = can_wiki, user_title = user_title, bookmarked = bookmarked, actions_summary = actions_summary, moderator = moderator, admin = admin, staff = staff, user_id = user_id, draft_sequence = draft_sequence, hidden = hidden, trust_level = trust_level, deleted_at = deleted_at, user_deleted = user_deleted, edit_reason = edit_reason, can_view_edit_history = can_view_edit_history, wiki = wiki, reviewable_id = reviewable_id, reviewable_score_count = reviewable_score_count, reviewable_score_pending_count = reviewable_score_pending_count, mentioned_users = mentioned_users)
                 db.session.add(new_discourse_post)
                 Ticket = Ticket.query.filter_by(ticket_id = ticket_id).first()
                 Ticket.discourse_post_id = post_id

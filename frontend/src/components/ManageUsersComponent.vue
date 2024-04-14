@@ -15,6 +15,11 @@
                             <input type="text" class="form-control" v-model="emailID" required />
                         </div>
                         <br />
+                        <div class="form-group">
+                            <label>Enter Username</label>
+                            <input type="text" class="form-control" v-model="username" required />
+                        </div>
+                        <br />
                         <div class="form-group"><label>Choose Role</label><select v-model="roleID" class="form-select">
                                 <option value="student">Student</option>
                                 <option value="support agent">Support Agent</option>
@@ -133,7 +138,7 @@ export default {
                 data = JSON.stringify(data);
                 console.log("Data is :")
                 console.log(data);
-                await axios.post("/api/user", data).then((res) => {
+                await axios.post("/api/v1/discourse/create/user", data).then((res) => {
                     alert("User has been successfully added.")
                     this.$router.go();
                     console.log(res)
