@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import functools
 from flask import request, jsonify
 import jwt
-from .config import Config
+from .config import Config,LocalDevelopmentConfig
+
 engine = None
 Base = declarative_base()
 db = SQLAlchemy()
@@ -21,6 +22,7 @@ class User(db.Model):
     tickets = db.relationship('Ticket',  back_populates='creator', lazy='subquery')
     discourse_username = db.Column(db.String(100),nullable=True)
     discourse_userid = db.Column(db.Integer,nullable=True)
+    discourse_password = db.Column(db.String[100],nullable=True)
 
 class Response(db.Model):
     response_id = db.Column(db.Integer, primary_key=True, autoincrement=True)

@@ -9,10 +9,11 @@ from celery import chain
 from application.tasks import send_email, response_notification
 from datetime import datetime, timedelta
 import jwt
-from .config import Config
+from .config import Config, LocalDevelopmentConfig
 from werkzeug.exceptions import HTTPException
 from application import index
 import requests
+import json
 
 class TicketAPI(Resource):
     @token_required
@@ -204,9 +205,10 @@ class UserAPI(Resource):
     def post(user,self):
         if(user.role_id==3 or user.role_id==4):
             data=request.get_json()
-            secure_str = ''.join((secrets.choice(string.ascii_letters) for i in range(8)))
-            user_name=generate_username(1)[0]
-            user=User(user_name=user_name,email_id=data['email_id'],password=secure_str,role_id=data['role_id'])
+            data = json.loads(data['data'])
+            secure_str = data['password']
+            user_name= data['username']
+            user=User(user_name=user_name,email_id=data["email_id"],password=secure_str,role_id=data['role_id'])
             db.session.add(user)
             db.session.commit()
             return jsonify({'message':'User created successfully'})
@@ -964,26 +966,25 @@ class DiscourseUser(Resource):
     
     @token_required
     def post(user,self):
-        args = request.get_json(force = True)
-        email = None
-        password = None
-        username = None
+        
+        data = request.get_json()
+        data = json.loads(data['data'])
+    
+        email = data['email_id']
+        password = data['password']
+        username = data['username']
+        #print(email,password,username)
         data = None
         headers = None
-        
-        try:
-            email = args["email"]
-            password = args["password"]
-            username = args["username"]
-            
-        except:
-            abort(400, message = "Please provide the email, password and username.")
+        print(user.role_id)
         
         if user.role_id == 3 or user.role_id == 4:
-            try:
-                user = User.query.filter_by(email_id = email).first()
-                data = {
-                    "name": user.name,
+            #user1 = User.query.filter_by(email_id = email).first()
+            #print(user1.user_name)
+            
+            user1 = User.query.filter_by(email_id = email).first()
+            data1 = {
+                    "name": user1.user_name,
                     "email": email,
                     "password": password,
                     "username": username,
@@ -991,15 +992,13 @@ class DiscourseUser(Resource):
                     "approved": "true"
                     
                 }
-            except:
-                abort(404, message = "User does not exist.")
             
             
         elif user.role_id == 1 or user.role_id == 2:
             try:
-                user = User.query.filter_by(email_id = email).first()
-                data = {
-                    "name": user.name,
+                user1 = User.query.filter_by(email_id = email).first()
+                data1 = {
+                    "name": user1.name,
                     "email": email,
                     "password": password,
                     "username": username,
@@ -1010,20 +1009,23 @@ class DiscourseUser(Resource):
             except:
                 abort(404, message = "User does not exist.")
 
-        try:
-            headers = {
-                        "Api-Key": Config.DISCOURSE_API_KEY,
-                        "Api-Username": Config.DISCOURSE_API_USERNAME
+        
+        headers = {
+                    "Api-Key": "e5299d207efeb7e5c2eb544877eb60c9574ca0b515019f7372bf6136a1cb95b9",
+                    "Api-Username": "maheedhareducation"
                     }
-            url = "http://localhost:4200/users"
-                
-            request = requests.post(url, data = jsonify(data), headers = headers)
-
-            if request.status_code == 200:
-                resp = request.json()
+        url = "http://localhost:4200/users"
+        requ = requests.post(url,json=data1, headers = headers)
+        print(requ)
+        print("Response status code:", requ.status_code)
+        print("Response content:", requ.content)
+        if requ.status_code == 200:
+                resp = requ.json()
                 # user disoucrse id in user 
-                user.discourse_userid = resp["user_id"]
-                user.discourse_username = username 
+                user1.discourse_userid = resp["user_id"]
+                user1.discourse_username = username 
+                user1.discourse_password = password
+                db.session.add(user1)
                 db.session.commit()
                 
                 return jsonify({
@@ -1031,12 +1033,11 @@ class DiscourseUser(Resource):
                     "active": resp["active"],
                     "message": resp["message"]
                     }) 
-            else:
-                return jsonify({"status": "failed", "message": "User in Discourse could not be created."})
-        except:
-            abort(404, message = "Discourse server not reachable.")
+        else:
+            return jsonify({"status": "failed", "message": "User in Discourse could not be created."}),requ.status_code
+        #return "pass"
 
-        return jsonify({"status": "failed", "message": "User in Discourse could not be created."})
+        #return jsonify({"status": "failed", "message": "User in Discourse could not be created."})
     
     
 
