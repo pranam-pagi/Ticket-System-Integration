@@ -205,6 +205,7 @@ class UserAPI(Resource):
     def post(user,self):
         if(user.role_id==3 or user.role_id==4):
             data=request.get_json()
+            print(data)
             data = json.loads(data['data'])
             secure_str = data['password']
             user_name= data['username']
@@ -252,10 +253,25 @@ class UserAPI(Resource):
     
 class UserDelete(Resource):
     @token_required
-    def delete(user,self,user_id):
+    def delete(user,self,user_name):
         if user.role_id==3:
-            current_user = User.query.filter(User.user_id==user_id).first()
+            current_user = User.query.filter(User.user_name==user_name).first()
             if current_user:
+                data1 = {
+                        "delete_posts": "true",
+                        "block_email": "true",
+                        "block_urls": "true",
+                        "block_ip": "true"
+                }
+                headers = {
+                    "Api-Key": "e5299d207efeb7e5c2eb544877eb60c9574ca0b515019f7372bf6136a1cb95b9",
+                    "Api-Username": "maheedhareducation"
+                }
+                url = f"http://localhost:4200/users/{current_user.discourse_userid}"
+                requ = requests.post(url,json=data1, headers = headers)
+                print(requ) 
+                print("Response status code:", requ.status_code)
+                print("Response content:", requ.content)
                 db.session.delete(current_user)
                 db.session.commit()
                 return jsonify({'message':'User deleted successfully'})

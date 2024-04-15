@@ -149,29 +149,30 @@ export default {
   methods: {
     async onDelete(x) {
       x.preventDefault();
+      // await axios
+      //   .get('/api/user')
+      //   .then((res) => {
+      //     let data = res.data.data;
+      //     this.usernames = data.map(({ user_name }) => user_name);
+      //     if (!this.usernames.includes(this.username)) {
+      //       alert("This username doesn't exist or is an admin/manager.");
+      //       this.$router.go();
+      //     } else {
+      //       data.forEach((x) => {
+      //         if (x.user_name == this.username) {
+      //           this.user_id = x.user_id;
+      //           console.log(this.user_id);
+      //         }
+      //       });
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
       await axios
-        .get('/api/user')
+        .delete(`/api/user`)
         .then((res) => {
-          let data = res.data.data;
-          this.usernames = data.map(({ user_name }) => user_name);
-          if (!this.usernames.includes(this.username)) {
-            alert("This username doesn't exist or is an admin/manager.");
-            this.$router.go();
-          } else {
-            data.forEach((x) => {
-              if (x.user_name == this.username) {
-                this.user_id = x.user_id;
-                console.log(this.user_id);
-              }
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      await axios
-        .delete(`/api/user/${this.user_id}`)
-        .then(() => {
+          console.log(res);
           alert('User deleted successfully');
           this.$router.go();
         })
@@ -227,7 +228,7 @@ export default {
                 .catch((err) => console.log(err));
             }
             alert('User has been successfully added.');
-            //this.$router.go();
+            this.$router.go();
             console.log(res);
           })
           .catch((err) => {
