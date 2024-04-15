@@ -17,7 +17,7 @@ api.add_resource(getResponseAPI_by_ticket,'/api/getResponseAPI_by_ticket') #Only
 api.add_resource(Login,'/login')
 api.add_resource(ImportResourceUser,'/api/importUsers')
 api.add_resource(TicketDelete,'/api/ticket/<int:ticket_id>')
-api.add_resource(UserDelete,'/api/user/<string:user_name>')
+api.add_resource(UserDelete,'/api/user/<user_name>')
 api.add_resource(ResponseAPI_by_responseID_delete, '/api/respRespDel/<int:responder_id>/<int:response_id>')
 api.add_resource(CategoryAPI, '/api/category')
 api.add_resource(DiscoursePost, '/api/v1/discourse/create/post')

@@ -267,8 +267,8 @@ class UserDelete(Resource):
                     "Api-Key": "e5299d207efeb7e5c2eb544877eb60c9574ca0b515019f7372bf6136a1cb95b9",
                     "Api-Username": "maheedhareducation"
                 }
-                url = f"http://localhost:4200/users/{current_user.discourse_userid}"
-                requ = requests.post(url,json=data1, headers = headers)
+                url = f"http://localhost:4200/admin/users/{current_user.discourse_userid}"
+                requ = requests.delete(url,json=data1, headers = headers)
                 print(requ) 
                 print("Response status code:", requ.status_code)
                 print("Response content:", requ.content)
@@ -1037,6 +1037,7 @@ class DiscourseUser(Resource):
         print("Response content:", requ.content)
         if requ.status_code == 200:
                 resp = requ.json()
+                print(resp)
                 # user disoucrse id in user 
                 user1.discourse_userid = resp["user_id"]
                 user1.discourse_username = username 

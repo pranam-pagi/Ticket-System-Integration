@@ -170,7 +170,7 @@ export default {
       //     console.log(err);
       //   });
       await axios
-        .delete(`/api/user`)
+        .delete(`/api/user/${this.username}`)
         .then((res) => {
           console.log(res);
           alert('User deleted successfully');
