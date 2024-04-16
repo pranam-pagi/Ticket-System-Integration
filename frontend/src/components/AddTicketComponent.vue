@@ -45,28 +45,29 @@ export default {
             title: "",
             description: "",
             results: null,
+            ticket: null
         };
     },
-    // watch: {
-    //     title: async function (val) {
-    //        let url = 'https://RRBO0FF8YF-dsn.algolia.net/1/indexes/sociogrammers_app/query'
-    //        // eslint-disable-next-line
-    //        let config = {
-    //             headers: {
-    //                 'X-Algolia-Application-Id': 'RRBO0FF8YF',
-    //                 'X-Algolia-API-Key': 'c9cbb1a94125ef968dc0dc85f9d235f9',
-    //                     }
-    //                 }
-    //         // eslint-disable-next-line
-    //         let data = {
-    //             'query': val
-    //         }
-    //         var instance = axios.create();
-    //         delete instance.defaults.headers.common['secret_authtoken'];
-    //         const response = await instance.post(url, data, config)
-    //         this.results = response.data.hits
-    //     }
-    // },
+    watch: {
+        title: async function (val) {
+           let url = 'https://ONID3NGIHD-dsn.algolia.net/1/indexes/sociogrammers_app/query'
+           // eslint-disable-next-line
+           let config = {
+                headers: {
+                    'X-Algolia-Application-Id': 'ONID3NGIHD',
+                    'X-Algolia-API-Key': '75a0ed6374006251bc6ec7f3c6c267f2',
+                        }
+                    }
+            // eslint-disable-next-line
+            let data = {
+                'query': val
+            }
+            var instance = axios.create();
+            delete instance.defaults.headers.common['secret_authtoken'];
+            const response = await instance.post(url, data, config)
+            this.results = response.data.hits
+        }
+    },
     methods: {
         async addCard() {
             var data = {
@@ -88,6 +89,31 @@ export default {
             }).then((res) => {
                 console.log(res);
                 if (res.status == 200) {
+                    axios.get("/api/ticket").then((resp) => {
+                        if (resp.status == 200) {
+                            this.ticket = resp.data.data[resp.data.data.length - 1]
+                            console.log(this.ticket.ticket_id)
+
+                            axios.post("/api/v1/discourse/create/post", { 
+                                title: this.title,
+                                raw: this.description,
+                                category: 1,
+                                ticket_id: this.ticket.ticket_id
+                            }, {
+                                headers: {
+                                "Content-Type": "application/json"
+                                }
+                            }).then((res) => {
+                                if (res.status == 200) {
+                                    console.log(res);
+                                }
+                            }).catch((err) => {
+                                console.log(err);
+                            })
+                        }
+                    }).catch((error) => {
+                        console.log(error);
+                    })
                     alert("Ticket Added Successfully");
                     this.$router.push("/dashboard");
                 } else {
@@ -95,8 +121,7 @@ export default {
                 }
             }).catch((err) => {
                 console.log(err);
-            });       
-            
+            });
         }
     },
 }

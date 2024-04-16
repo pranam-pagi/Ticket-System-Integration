@@ -1027,8 +1027,8 @@ class DiscourseUser(Resource):
 
         
         headers = {
-                    "Api-Key": "e5299d207efeb7e5c2eb544877eb60c9574ca0b515019f7372bf6136a1cb95b9",
-                    "Api-Username": "maheedhareducation"
+                    "Api-Key": "730cdad0b59bbed10147f23bdf9757120be99452a7f6ad25e26ea2563af7b872",
+                    "Api-Username": "super"
                     }
         url = "http://localhost:4200/users"
         requ = requests.post(url,json=data1, headers = headers)
@@ -1062,26 +1062,26 @@ class DiscoursePost(Resource):
     
     @token_required
     def post(user,self):
-        
+
         try:
-            User = User.query.filter_by(user_id = user.user_id).first()
+            user = User.query.filter_by(user_id = user.user_id).first()
         except:
             abort(404, message = "User does not exist.")
         try:
             url = "http://localhost:4200/posts"
             headers = {
-                "Api-Key": Config.DISCOURSE_API_KEY,
-                "Api-Username": User.discourse_username
+                "Api-Key": '730cdad0b59bbed10147f23bdf9757120be99452a7f6ad25e26ea2563af7b872',
+                "Api-Username": 'super'
             }
-            
+
             args = request.get_json(force = True)
             ticket_id = None
             title = None
             raw = None
-            Category = None
-            target_recipients = "support_team"
+            category = None
+            target_recipients = "super"
             archetype = "private_message"
-            
+
             if args["title"]:
                 title = args["title"]
             else:
@@ -1091,26 +1091,31 @@ class DiscoursePost(Resource):
             else:
                 abort(400, message = "Please provide the raw content.")
             if args["category"]:
-                category = args["category"]
+                category = args["category"]             
             else:
                 abort(400, message = "Please provide a category.")
             if args["ticket_id"]:
                 ticket_id = args["ticket_id"]
+
             else:
                 abort(400, message = "Please provide the ticket ID.")
                 
             data = {
                 "title": title,
                 "raw": raw,
+                "topic_id": 2,
                 "category": category,
                 "target_recipients": target_recipients,
                 "archetype": archetype
             }
-            
-            request = requests.post(url, data = jsonify(data), headers = headers)
-        
-            if request.status_code == 200:
-                resp = request.json() 
+
+            print(json.dumps(data))      
+            request1 = requests.post(url, json = json.dumps(data), headers = headers)
+            print("Response status code:", request1.status_code)
+            print("Response content:", request1.content)
+
+            if request1.status_code == 200:
+                resp = request1.json() 
                 
                 post_id = None
                 topic_id = None
@@ -1254,7 +1259,53 @@ class DiscoursePost(Resource):
                 if resp["mentioned_users"]:
                     mentioned_users = resp["mentioned_users"]
                     
-                new_discourse_post = DiscoursePost(post_id = post_id, topic_id = topic_id, topic_slug = topic_slug, username = User.discourse_username, created_at = created_at, updated_at = updated_at, cooked = cooked, reply_count = reply_count, reply_to_post_number = reply_to_post_number, quote_count = quote_count, incoming_link_count = incoming_link_count, reads = reads, readers_count = readers_count, score = score, yours = yours, display_username = display_username, primary_group_name = primary_group_name, flair_name = flair_name, flair_url = flair_url, flair_bg_color = flair_bg_color, flair_color = flair_color, flair_group_id = flair_group_id, version = version, can_edit = can_edit, can_delete = can_delete, can_recover = can_recover, can_see_hidden_post = can_see_hidden_post, can_wiki = can_wiki, user_title = user_title, bookmarked = bookmarked, actions_summary = actions_summary, moderator = moderator, admin = admin, staff = staff, user_id = user_id, draft_sequence = draft_sequence, hidden = hidden, trust_level = trust_level, deleted_at = deleted_at, user_deleted = user_deleted, edit_reason = edit_reason, can_view_edit_history = can_view_edit_history, wiki = wiki, reviewable_id = reviewable_id, reviewable_score_count = reviewable_score_count, reviewable_score_pending_count = reviewable_score_pending_count, mentioned_users = mentioned_users)
+                new_discourse_post = DiscoursePost(post_id = post_id, 
+                                                   topic_id = topic_id, 
+                                                   topic_slug = topic_slug, 
+                                                   username = user.discourse_username, 
+                                                   created_at = created_at, 
+                                                   updated_at = updated_at, 
+                                                   cooked = cooked, 
+                                                   reply_count = reply_count, 
+                                                   reply_to_post_number = reply_to_post_number, 
+                                                   quote_count = quote_count, 
+                                                   incoming_link_count = incoming_link_count, 
+                                                   reads = reads, 
+                                                   readers_count = readers_count, 
+                                                   score = score, 
+                                                   yours = yours, 
+                                                   display_username = display_username, 
+                                                   primary_group_name = primary_group_name, 
+                                                   flair_name = flair_name, 
+                                                   flair_url = flair_url, 
+                                                   flair_bg_color = flair_bg_color, 
+                                                   flair_color = flair_color, 
+                                                   flair_group_id = flair_group_id, 
+                                                   version = version, 
+                                                   can_edit = can_edit, 
+                                                   can_delete = can_delete, 
+                                                   can_recover = can_recover,
+                                                   can_see_hidden_post = can_see_hidden_post, 
+                                                   can_wiki = can_wiki, 
+                                                   user_title = user_title, 
+                                                   bookmarked = bookmarked, 
+                                                   actions_summary = actions_summary, 
+                                                   moderator = moderator, 
+                                                   admin = admin, 
+                                                   staff = staff, 
+                                                   user_id = user_id, 
+                                                   draft_sequence = draft_sequence, 
+                                                   hidden = hidden, 
+                                                   trust_level = trust_level, 
+                                                   deleted_at = deleted_at, 
+                                                   user_deleted = user_deleted, 
+                                                   edit_reason = edit_reason, 
+                                                   can_view_edit_history = can_view_edit_history, 
+                                                   wiki = wiki, 
+                                                   reviewable_id = reviewable_id, 
+                                                   reviewable_score_count = reviewable_score_count, 
+                                                   reviewable_score_pending_count = reviewable_score_pending_count, 
+                                                   mentioned_users = mentioned_users)
                 db.session.add(new_discourse_post)
                 Ticket = Ticket.query.filter_by(ticket_id = ticket_id).first()
                 Ticket.discourse_post_id = post_id
@@ -1265,8 +1316,7 @@ class DiscoursePost(Resource):
                     "message": "Post in Discourse created successfully."
                     }) 
             else:
-                return jsonify({"status": "failed", "message": "Post in Discourse could not be created."})
+                # abort(422, message = "Post in Discourse could not be created.")
+                return jsonify({"status": "failed", "message": "Post in Discourse could not be created."}), request.status_code
         except:
             abort(404, message = "Discourse server not reachable.")
-            
-            
