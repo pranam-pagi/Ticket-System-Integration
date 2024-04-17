@@ -1,3 +1,8 @@
 ./backend/flask
 
 /frontend/node_modules/
+
+flask
+node_modules
+testdb.sqlite3
+__pycache__

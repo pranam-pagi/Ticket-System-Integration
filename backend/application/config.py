@@ -38,13 +38,13 @@ class LocalDevelopmentConfig(Config):
     CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_HOST = 'localhost'
     CACHE_REDIS_PORT = 6379
-    DISCOURSE_API_KEY = "maheedhareducation"
-    DISCOURSE_API_USERNAME = "e5299d207efeb7e5c2eb544877eb60c9574ca0b515019f7372bf6136a1cb95b9"
+    DISCOURSE_API_KEY = "730cdad0b59bbed10147f23bdf9757120be99452a7f6ad25e26ea2563af7b872"
+    DISCOURSE_API_USERNAME = "super"
     try:
-        MAILGUN_API_KEY = os.esnviron.get('MG_API_KEY')
+        # MAILGUN_API_KEY = os.esnviron.get('MG_API_KEY')
         SEARCH_API_KEY = os.environ.get('SEARCH_API_KEY')
     except: 
-        MAILGUN_API_KEY = 'ABCD'
+        # MAILGUN_API_KEY = 'ABCD'
         SEARCH_API_KEY = 'ABCD'
     
 

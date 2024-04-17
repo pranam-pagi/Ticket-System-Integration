@@ -22,7 +22,9 @@ api.add_resource(ResponseAPI_by_responseID_delete, '/api/respRespDel/<int:respon
 api.add_resource(CategoryAPI, '/api/category')
 api.add_resource(DiscoursePost, '/api/v1/discourse/create/post')
 api.add_resource(DiscourseUser, '/api/v1/discourse/create/user')
+
 from application.routes import *
+
 if __name__ == '__main__':
   # Run the Flask app
   app.run(debug=True)
