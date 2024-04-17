@@ -971,9 +971,25 @@ class CategoryAPI(Resource):
             except:
                 abort(400, message='category is required and should be string')
             new_cat = Category(category=category)
-            db.session.add(new_cat)
-            db.session.commit()
-            return jsonify({"status": "success"})
+            headers = {
+                    "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
+                    "Api-Username": LocalDevelopmentConfig.DISCOURSE_API_USERNAME
+                    }
+            data ={
+                "name": category
+            }
+            
+            url = "http://localhost:4200/categories"
+            request= requests.post(url, json=data, headers=headers)
+            
+            if request.status_code == 200:
+                db.session.add(new_cat)
+                db.session.commit()
+                return jsonify({"status": "success"})
+            else:
+                db.session.rollback()
+                return jsonify({"status": "failed"})
+                # db.session.rollback()
         else: 
             abort(403,message="Unauthorized")
 
@@ -989,12 +1005,13 @@ class DiscourseUser(Resource):
         email = data['email_id']
         password = data['password']
         username = data['username']
+        role_id = data['role_id']
         #print(email,password,username)
         data = None
         headers = None
         print(user.role_id)
         
-        if user.role_id == 3 or user.role_id == 4:
+        if role_id == 3 or role_id == 4:
             #user1 = User.query.filter_by(email_id = email).first()
             #print(user1.user_name)
             
@@ -1010,7 +1027,7 @@ class DiscourseUser(Resource):
                 }
             
             
-        elif user.role_id == 1 or user.role_id == 2:
+        elif role_id == 1 or role_id == 2:
             try:
                 user1 = User.query.filter_by(email_id = email).first()
                 data1 = {
@@ -1027,8 +1044,8 @@ class DiscourseUser(Resource):
 
         
         headers = {
-                    "Api-Key": "730cdad0b59bbed10147f23bdf9757120be99452a7f6ad25e26ea2563af7b872",
-                    "Api-Username": "super"
+                    "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
+                    "Api-Username": LocalDevelopmentConfig.DISCOURSE_API_USERNAME
                     }
         url = "http://localhost:4200/users"
         requ = requests.post(url,json=data1, headers = headers)
@@ -1070,9 +1087,9 @@ class DiscoursePost(Resource):
         try:
             url = "http://localhost:4200/posts"
             headers = {
-                "Api-Key": '730cdad0b59bbed10147f23bdf9757120be99452a7f6ad25e26ea2563af7b872',
-                "Api-Username": 'super'
-            }
+                    "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
+                    "Api-Username": user.discourse_username
+                    }
 
             args = request.get_json(force = True)
             ticket_id = None
@@ -1086,7 +1103,7 @@ class DiscoursePost(Resource):
                 title = args["title"]
             else:
                 abort(400, message = "Please provide a title.")
-            if args["raw"]:
+            if args["message_body"]:
                 raw = args["raw"]
             else:
                 abort(400, message = "Please provide the raw content.")
@@ -1102,8 +1119,7 @@ class DiscoursePost(Resource):
                 
             data = {
                 "title": title,
-                "raw": raw,
-                "topic_id": 2,
+                "raw": raw,              
                 "category": category,
                 "target_recipients": target_recipients,
                 "archetype": archetype

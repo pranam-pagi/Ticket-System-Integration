@@ -6,3 +6,10 @@ flask
 node_modules
 testdb.sqlite3
 __pycache__
+
+./backend/env
+env
+.env
+*.env
+backend/env
+/backend/env
