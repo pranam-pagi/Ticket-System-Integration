@@ -100,9 +100,7 @@ class DiscoursePost(db.Model):
     edit_reason = db.Column(db.String(100), nullable=True)
     can_view_edit_history = db.Column(db.Boolean, nullable=True)
     wiki = db.Column(db.Boolean, nullable=True)
-    reviewable_id = db.Column(db.String(100), nullable=True)
-    reviewable_score_count = db.Column(db.Integer, nullable=True)
-    reviewable_score_pending_count = db.Column(db.Integer, nullable=True)
+    
     mentioned_users = db.Column(db.String(100), nullable=True)
 
 class Category(db.Model):

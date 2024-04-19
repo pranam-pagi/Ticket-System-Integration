@@ -2,7 +2,7 @@ from application import app, api, celery
 
 from application.api import TicketAPI , UserAPI, FAQApi, ResponseAPI_by_ticket, ResponseAPI_by_response_id, ResponseAPI_by_user,TicketAll, getResolutionTimes, flaggedPostAPI, getResponseAPI_by_ticket,Login,ImportResourceUser, ResponseAPI_by_responseID_delete, CategoryAPI
 from application.api import TicketDelete,UserDelete
-from application.api import DiscoursePost,DiscourseUser
+from application.api import DiscoursePostCreation,DiscourseUser
 
 api.add_resource(TicketAPI, '/api/ticket')
 api.add_resource(UserAPI,'/api/user')
@@ -20,7 +20,7 @@ api.add_resource(TicketDelete,'/api/ticket/<int:ticket_id>')
 api.add_resource(UserDelete,'/api/user/<user_name>')
 api.add_resource(ResponseAPI_by_responseID_delete, '/api/respRespDel/<int:responder_id>/<int:response_id>')
 api.add_resource(CategoryAPI, '/api/category')
-api.add_resource(DiscoursePost, '/api/v1/discourse/create/post')
+api.add_resource(DiscoursePostCreation, '/api/v1/discourse/create/post')
 api.add_resource(DiscourseUser, '/api/v1/discourse/create/user')
 
 from application.routes import *
