@@ -32,6 +32,7 @@
                 type="text"
                 class="form-control"
                 v-model="username"
+                placeholder="Enter the username to be atleast 3 characters"
                 required
               />
             </div>
@@ -54,7 +55,13 @@
                 <option value="manager">Manager</option>
               </select>
             </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button
+              class="btn btn-primary"
+              :disabled="isValidForm"
+              type="submit"
+            >
+              Submit
+            </button>
           </form>
         </div>
       </div>
@@ -145,6 +152,11 @@ export default {
       usernames: [],
       user_id: null,
     };
+  },
+  computed: {
+    isValidForm() {
+      return this.password.length >= 10 && this.username >= 3;
+    },
   },
   methods: {
     async onDelete(x) {
