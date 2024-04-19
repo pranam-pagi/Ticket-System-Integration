@@ -157,6 +157,62 @@ class TicketAPI(Resource):
                 'responses': [resp.response for resp in ticket.responses]
             }
             index.partial_update_object(obj=tk_obj)
+            try:
+                print("debug 1")
+                post_id = ticket.discourse_post_id
+                print(post_id)
+                url = 'http://localhost:4200/posts/'+str(post_id)
+                print(url)
+                data={
+                    "post":{
+                        "raw":ticket.description,
+                        "edit_reason":"Update post"
+                    }
+                }
+                headers = {
+                        "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
+                        "Api-Username": user.discourse_username
+                        }
+                print("debug 2")
+                # 'id': 62, 'name': 'studen1', 'username': 'studen1', 'avatar_template': '/letter_avatar_proxy/v4/letter/s/ecae2f/{size}.png', 'created_at': '2024-04-19T13:41:18.178Z', 'cooked': '<p>hola everyone edfasda 2232sdasd</p>', 'post_number': 1, 'post_type': 1, 'updated_at': '2024-04-19T14:27:39.672Z', 'reply_count': 0, 'reply_to_post_number': None, 'quote_count': 0, 'incoming_link_count': 0, 'reads': 1, 'readers_count': 0, 'score': 0.2, 'yours': True, 'topic_id': 60, 'topic_slug': 'das-dasdasd-asd-adasdasd-asd', 'display_username': 'studen1', 'primary_group_name': None, 'flair_name': None, 'flair_url': None, 'flair_bg_color': None, 'flair_color': None, 'flair_group_id': None, 'version': 2, 'can_edit': True, 'can_delete': False, 'can_recover': False, 'can_see_hidden_post': True, 'can_wiki': False, 'user_title': None, 'bookmarked': False, 'raw': 'hola everyone edfasda 2232sdasd', 'actions_summary': [{'id': 3, 'can_act': True}, {'id': 4, 'can_act': True}, {'id': 8, 'can_act': True}, {'id': 7, 'can_act': True}, {'id': 10, 'can_act': True}], 'moderator': False, 'admin': False, 'staff': False, 'user_id': 36, 'draft_sequence': 2, 'hidden': False, 'trust_level': 1, 'deleted_at': None, 'user_deleted': False, 'edit_reason': 'Update post', 'can_view_edit_history': True, 'wiki': False}}
+                request1 = requests.put(url, json = data, headers = headers) 
+                print(request1.status_code)
+                # print(request1.content)        
+                if request1.status_code == 200:
+                    resp = request1.json()
+                    print(resp)
+                    discourse = DiscoursePost.query.filter_by(post_id = post_id).first()
+                    discourse.raw = ticket.description
+                    discourse.post_number = resp['post_number']
+                    discourse.post_type = resp['post_type']
+                    discourse.updated_at = resp['updated_at']
+                    discourse.reply_count = resp['reply_count']
+                    discourse.reply_to_post_number = resp['reply_to_post_number']
+                    discourse.quote_count = resp['quote_count']
+                    discourse.incoming_link_count = resp['incoming_link_count']
+                    discourse.reads = resp['reads']
+                    discourse.readers_count = resp['readers_count']
+                    discourse.score = resp['score']
+                    discourse.yours = resp['yours']
+                    discourse.topic_id = resp['topic_id']
+                    discourse.topic_slug = resp['topic_slug']
+                    discourse.display_username = resp['display_username']
+                    discourse.primary_group_name = resp['primary_group_name']
+                    discourse.version = resp['version']
+                    discourse.can_edit = resp['can_edit']
+                    discourse.can_delete = resp['can_delete']
+                    discourse.can_recover = resp['can_recover']
+                    discourse.can_see_hidden_post = resp['can_see_hidden_post']
+                    discourse.can_wiki = resp['can_wiki']
+                    discourse.user_title = resp['user_title']
+                    discourse.bookmarked = resp['bookmarked']
+                    discourse.raw = resp['raw']
+                    
+                    
+                    db.session.commit()
+                    return jsonify({"message": "Ticket updated successfully"})
+            except:
+                pass
             return jsonify({"message": "Ticket updated successfully"})
         
         else:
@@ -1146,7 +1202,7 @@ class DiscoursePostCreation(Resource):
                 "title": title,
                 "raw": raw,              
                 "category": 0,
-                "target_recipients": "system",
+                "target_recipients": "discourse_support",
                 "archetype": "private_message"
             }
             print("debug 16")

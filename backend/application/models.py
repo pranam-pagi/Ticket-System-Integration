@@ -47,7 +47,6 @@ class Ticket(db.Model):
     responses = db.relationship('Response', back_populates='parent_list', lazy='subquery')
     creator = db.relationship('User', back_populates='tickets', lazy='subquery')
     rating = db.Column(db.Integer)
-    
     discourse_post_id = db.Column(db.Integer, nullable=True)
     
     
