@@ -158,7 +158,7 @@ class TicketAPI(Resource):
             }
             index.partial_update_object(obj=tk_obj)
             try:
-                print("debug 1")
+          
                 post_id = ticket.discourse_post_id
                 print(post_id)
                 url = 'http://localhost:4200/posts/'+str(post_id)
@@ -173,7 +173,7 @@ class TicketAPI(Resource):
                         "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
                         "Api-Username": user.discourse_username
                         }
-                print("debug 2")
+               
                 # 'id': 62, 'name': 'studen1', 'username': 'studen1', 'avatar_template': '/letter_avatar_proxy/v4/letter/s/ecae2f/{size}.png', 'created_at': '2024-04-19T13:41:18.178Z', 'cooked': '<p>hola everyone edfasda 2232sdasd</p>', 'post_number': 1, 'post_type': 1, 'updated_at': '2024-04-19T14:27:39.672Z', 'reply_count': 0, 'reply_to_post_number': None, 'quote_count': 0, 'incoming_link_count': 0, 'reads': 1, 'readers_count': 0, 'score': 0.2, 'yours': True, 'topic_id': 60, 'topic_slug': 'das-dasdasd-asd-adasdasd-asd', 'display_username': 'studen1', 'primary_group_name': None, 'flair_name': None, 'flair_url': None, 'flair_bg_color': None, 'flair_color': None, 'flair_group_id': None, 'version': 2, 'can_edit': True, 'can_delete': False, 'can_recover': False, 'can_see_hidden_post': True, 'can_wiki': False, 'user_title': None, 'bookmarked': False, 'raw': 'hola everyone edfasda 2232sdasd', 'actions_summary': [{'id': 3, 'can_act': True}, {'id': 4, 'can_act': True}, {'id': 8, 'can_act': True}, {'id': 7, 'can_act': True}, {'id': 10, 'can_act': True}], 'moderator': False, 'admin': False, 'staff': False, 'user_id': 36, 'draft_sequence': 2, 'hidden': False, 'trust_level': 1, 'deleted_at': None, 'user_deleted': False, 'edit_reason': 'Update post', 'can_view_edit_history': True, 'wiki': False}}
                 request1 = requests.put(url, json = data, headers = headers) 
                 print(request1.status_code)
@@ -233,6 +233,30 @@ class TicketDelete(Resource):
             db.session.delete(current_ticket)
             db.session.commit()
             index.delete_object(current_ticket.ticket_id)
+            try:
+                post_id = current_ticket.discourse_post_id
+                print(post_id)
+                url = 'http://localhost:4200/posts/'+str(post_id)
+                print(url)
+                data={
+                    "force_destroy": "true"
+                }
+                headers = {
+                        "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
+                        "Api-Username": user.discourse_username
+                }
+                request1 = requests.put(url, json = data, headers = headers) 
+                print(request1.status_code)
+                # print(request1.content)        
+                if request1.status_code == 200:
+                    resp = request1.json()
+                    print(resp)
+                    return jsonify({"message": "Ticket deleted successfully"})
+                
+            except:
+                pass
+            
+            
             return jsonify({"message": "Ticket deleted successfully"})
         else:
             abort(400, message='No such ticket_id exists for the user')
@@ -1150,23 +1174,23 @@ class DiscoursePostCreation(Resource):
     def post(user,self):
 
         try:
-            print("debug 1")
+           
             user = User.query.filter_by(user_id = user.user_id).first()
-            print("debug 2")
+           
         except:
-            print("debug 3")
+            
             abort(404, message = "User does not exist.")
         try:
-            print("debug 4")
+            
             url = "http://localhost:4200/posts"
-            print("debug 5")
+          
             headers = {
                     "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
                     "Api-Username": user.discourse_username
                     }
-            print("debug 6")
+            
             args = request.get_json(force = True)
-            print("debug 7", args)
+           
             ticket_id = None
             title = None
             raw = None
@@ -1175,27 +1199,27 @@ class DiscoursePostCreation(Resource):
             # archetype = "private_message"
 
             if args["title"]:
-                print("debug 8")
+               
                 title = args["title"]
             else: 
-                print("debug 9")
+                
                 abort(400, message = "Please provide a title.")
             
             if args["message_body"]:
-                print("debug 10")
+                
                 raw = args["message_body"]
             else:
-                print("debug 11")
+             
                 abort(400, message = "Please provide the raw content.")
             
             
             
             if args["ticket_id"]:
-                print("debug 14")
+               
                 ticket_id = args["ticket_id"]
 
             else:
-                print("debug 15")
+              
                 abort(400, message = "Please provide the ticket ID.")
                 
             data = {
@@ -1205,7 +1229,7 @@ class DiscoursePostCreation(Resource):
                 "target_recipients": "discourse_support",
                 "archetype": "private_message"
             }
-            print("debug 16")
+          
 
             print(json.dumps(data))      
             request1 = requests.post(url, json = data, headers = headers)
@@ -1262,38 +1286,37 @@ class DiscoursePostCreation(Resource):
                 reviewable_score_count = None
                 reviewable_score_pending_count = None
                 mentioned_users = None
-                print("debug 21")
-                print("debug 225")
+             
                 if resp["id"]:
                     post_id = resp["id"]
-                print("debug 34")
+                
                 if resp["topic_id"]:
                     topic_id = resp["topic_id"]
-                print("debug 341")
+                
                 if resp["topic_slug"]:
                     topic_slug = resp["topic_slug"]
-                print("debug 343")
+                # print("debug 343")
                 if resp["created_at"]:
                     created_at = resp["created_at"]
-                print("debug 343")
+                # print("debug 343")
                 if resp["updated_at"]:
                     updated_at = resp["updated_at"]
-                print("debug tes")
+                # print("debug tes")
                 if resp["cooked"]:
                     cooked = resp["cooked"]
-                print("debug df")
+                # print("debug df")
                 if resp["reply_count"]:
                     reply_count = resp["reply_count"]
-                print("debug df")
+                # print("debug df")
                 if resp["reply_to_post_number"]:
                     reply_to_post_number = resp["reply_to_post_number"]
-                print("debug df")
+                # print("debug df")
                 if resp["quote_count"]:
                     quote_count = resp["quote_count"]
-                print("debug df")
+                # print("debug df")
                 if resp["incoming_link_count"]:
                     incoming_link_count = resp["incoming_link_count"]
-                print("debug df")
+                # print("debug df")
                 if resp["reads"]:
                     reads = resp["reads"]
                 print("debug df")
