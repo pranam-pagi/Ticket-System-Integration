@@ -38,8 +38,8 @@ class LocalDevelopmentConfig(Config):
     CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_HOST = 'localhost'
     CACHE_REDIS_PORT = 6379
-    DISCOURSE_API_KEY = "730cdad0b59bbed10147f23bdf9757120be99452a7f6ad25e26ea2563af7b872"
-    DISCOURSE_API_USERNAME = "super"
+    DISCOURSE_API_KEY = "7f54f6cfe75fbcaedc4e891a5945cd192b4fe323473e1a87e1356e25e258e3b1"
+    DISCOURSE_API_USERNAME = "system"
     try:
         # MAILGUN_API_KEY = os.esnviron.get('MG_API_KEY')
         SEARCH_API_KEY = os.environ.get('SEARCH_API_KEY')

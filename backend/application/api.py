@@ -1006,15 +1006,16 @@ class DiscourseUser(Resource):
         password = data['password']
         username = data['username']
         role_id = data['role_id']
-        #print(email,password,username)
+        print(email,password,username, role_id)
         data = None
         headers = None
-        print(user.role_id)
+        # print(user.role_id)
+        # print("debug 1")
         
         if role_id == 3 or role_id == 4:
             #user1 = User.query.filter_by(email_id = email).first()
             #print(user1.user_name)
-            
+            # print("debug 2")
             user1 = User.query.filter_by(email_id = email).first()
             data1 = {
                     "name": user1.user_name,
@@ -1029,9 +1030,11 @@ class DiscourseUser(Resource):
             
         elif role_id == 1 or role_id == 2:
             try:
+                # print("debug 3")
                 user1 = User.query.filter_by(email_id = email).first()
+                # print(user1)
                 data1 = {
-                    "name": user1.name,
+                    "name": user1.user_name,
                     "email": email,
                     "password": password,
                     "username": username,
@@ -1040,22 +1043,28 @@ class DiscourseUser(Resource):
                     
                 }
             except:
+                # print("excep2 1")
                 abort(404, message = "User does not exist.")
 
-        
+        # print("debug 4")
         headers = {
                     "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
                     "Api-Username": LocalDevelopmentConfig.DISCOURSE_API_USERNAME
                     }
+        # print("debug 5")
         url = "http://localhost:4200/users"
+        # print("debug 6")
         requ = requests.post(url,json=data1, headers = headers)
-        print(requ)
-        print("Response status code:", requ.status_code)
-        print("Response content:", requ.content)
+        resp = requ.json()
+        # print("debug 7")
+        print(resp)
+        # print("Response status code:", requ.status_code)
+        # print("Response content:", requ.content)
         if requ.status_code == 200:
-                resp = requ.json()
+            if resp['success']:
                 print(resp)
                 # user disoucrse id in user 
+                # print(resp)
                 user1.discourse_userid = resp["user_id"]
                 user1.discourse_username = username 
                 user1.discourse_password = password
@@ -1067,6 +1076,10 @@ class DiscourseUser(Resource):
                     "active": resp["active"],
                     "message": resp["message"]
                     }) 
+                
+            else:    
+                return jsonify({"status": "failed", "message":resp["message"] })
+                
         else:
             return jsonify({"status": "failed", "message": "User in Discourse could not be created."}),requ.status_code
         #return "pass"
@@ -1081,258 +1094,273 @@ class DiscoursePost(Resource):
     def post(user,self):
 
         try:
+            print("debug 1")
             user = User.query.filter_by(user_id = user.user_id).first()
+            print("debug 2")
         except:
+            print("debug 3")
             abort(404, message = "User does not exist.")
         try:
+            print("debug 4")
             url = "http://localhost:4200/posts"
+            print("debug 5")
             headers = {
                     "Api-Key": LocalDevelopmentConfig.DISCOURSE_API_KEY,
                     "Api-Username": user.discourse_username
                     }
-
+            print("debug 6")
             args = request.get_json(force = True)
+            print("debug 7", args)
             ticket_id = None
             title = None
             raw = None
-            category = None
-            target_recipients = "super"
+            category = 0
+            target_recipients = "system"
             archetype = "private_message"
 
             if args["title"]:
+                print("debug 8")
                 title = args["title"]
-            else:
+            else: 
+                print("debug 9")
                 abort(400, message = "Please provide a title.")
+            
             if args["message_body"]:
-                raw = args["raw"]
+                print("debug 10")
+                raw = args["message_body"]
             else:
+                print("debug 11")
                 abort(400, message = "Please provide the raw content.")
-            if args["category"]:
-                category = args["category"]             
-            else:
-                abort(400, message = "Please provide a category.")
+            
+            
+            
             if args["ticket_id"]:
+                print("debug 14")
                 ticket_id = args["ticket_id"]
 
             else:
+                print("debug 15")
                 abort(400, message = "Please provide the ticket ID.")
                 
             data = {
                 "title": title,
                 "raw": raw,              
-                "category": category,
-                "target_recipients": target_recipients,
-                "archetype": archetype
+                "category": 4,
+                "target_recipients": "system",
+                "archetype": "private_message"
             }
+            print("debug 16")
 
             print(json.dumps(data))      
-            request1 = requests.post(url, json = json.dumps(data), headers = headers)
-            print("Response status code:", request1.status_code)
-            print("Response content:", request1.content)
-
+            request1 = requests.post(url, json = data, headers = headers)
+            print(request1)
+            print("debug 17")
             if request1.status_code == 200:
                 resp = request1.json() 
-                
+                print("debug 20")
+                print(resp)
                 post_id = None
-                topic_id = None
-                topic_slug = None
-                display_username = None
-                created_at = None
-                updated_at = None
-                cooked = None
-                reply_count = None
-                reply_to_post_number = None
-                quote_count = None
-                incoming_link_count = None
-                reads = None
-                readers_count = None
-                score = None
-                yours = None
-                display_username = None
-                primary_group_name = None
-                flair_name = None
-                flair_url = None
-                flair_bg_color = None
-                flair_color = None
-                flair_group_id = None
-                version = None
-                can_edit = None
-                can_delete = None
-                can_recover = None
-                can_see_hidden_post = None
-                can_wiki = None
-                user_title = None
-                bookmarked = None
-                actions_summary = None
-                moderator = None
-                admin = None
-                staff = None
-                user_id = None
-                draft_sequence = None
-                hidden = None
-                trust_level = None
-                deleted_at = None
-                user_deleted = None
-                edit_reason = None
-                can_view_edit_history = None
-                wiki = None
-                reviewable_id = None
-                reviewable_score_count = None
-                reviewable_score_pending_count = None
-                mentioned_users = None
-                
+                # topic_id = None
+                # topic_slug = None
+                # display_username = None
+                # created_at = None
+                # updated_at = None
+                # cooked = None
+                # reply_count = None
+                # reply_to_post_number = None
+                # quote_count = None
+                # incoming_link_count = None
+                # reads = None
+                # readers_count = None
+                # score = None
+                # yours = None
+                # display_username = None
+                # primary_group_name = None
+                # flair_name = None
+                # flair_url = None
+                # flair_bg_color = None
+                # flair_color = None
+                # flair_group_id = None
+                # version = None
+                # can_edit = None
+                # can_delete = None
+                # can_recover = None
+                # can_see_hidden_post = None
+                # can_wiki = None
+                # user_title = None
+                # bookmarked = None
+                # actions_summary = None
+                # moderator = None
+                # admin = None
+                # staff = None
+                # user_id = None
+                # draft_sequence = None
+                # hidden = None
+                # trust_level = None
+                # deleted_at = None
+                # user_deleted = None
+                # edit_reason = None
+                # can_view_edit_history = None
+                # wiki = None
+                # reviewable_id = None
+                # reviewable_score_count = None
+                # reviewable_score_pending_count = None
+                # mentioned_users = None
+                # print("debug 21")
                 
                 if resp["id"]:
                     post_id = resp["id"]
-                if resp["topic_id"]:
-                    topic_id = resp["topic_id"]
-                if resp["topic_slug"]:
-                    topic_slug = resp["topic_slug"]
-                if resp["created_at"]:
-                    created_at = resp["created_at"]
-                if resp["updated_at"]:
-                    updated_at = resp["updated_at"]
-                if resp["cooked"]:
-                    cooked = resp["cooked"]
-                if resp["reply_count"]:
-                    reply_count = resp["reply_count"]
-                if resp["reply_to_post_number"]:
-                    reply_to_post_number = resp["reply_to_post_number"]
-                if resp["quote_count"]:
-                    quote_count = resp["quote_count"]
-                if resp["incoming_link_count"]:
-                    incoming_link_count = resp["incoming_link_count"]
-                if resp["reads"]:
-                    reads = resp["reads"]
-                if resp["readers_count"]:
-                    readers_count = resp["readers_count"]
-                if resp["score"]:
-                    score = resp["score"]
-                if resp["yours"]:
-                    yours = resp["yours"]
-                if resp["display_username"]:
-                    display_username = resp["display_username"]
-                if resp["primary_group_name"]:
-                    primary_group_name = resp["primary_group_name"]
-                if resp["flair_name"]:
-                    flair_name = resp["flair_name"]
-                if resp["flair_url"]:
-                    flair_url = resp["flair_url"]
-                if resp["flair_bg_color"]:
-                    flair_bg_color = resp["flair_bg_color"]
-                if resp["flair_color"]:
-                    flair_color = resp["flair_color"]
-                if resp["flair_group_id"]:
-                    flair_group_id = resp["flair_group_id"]
-                if resp["version"]:
-                    version = resp["version"]
-                if resp["can_edit"]:
-                    can_edit = resp["can_edit"]
-                if resp["can_delete"]:
-                    can_delete = resp["can_delete"]
-                if resp["can_recover"]:
-                    can_recover = resp["can_recover"]
-                if resp["can_see_hidden_post"]:
-                    can_see_hidden_post = resp["can_see_hidden_post"]
-                if resp["can_wiki"]:
-                    can_wiki = resp["can_wiki"]
-                if resp["user_title"]:
-                    user_title = resp["user_title"]
-                if resp["bookmarked"]:
-                    bookmarked = resp["bookmarked"]
-                if resp["actions_summary"]:
-                    actions_summary = resp["actions_summary"]
-                if resp["moderator"]:
-                    moderator = resp["moderator"]
-                if resp["admin"]:
-                    admin = resp["admin"]
-                if resp["staff"]:
-                    staff = resp["staff"]
-                if resp["user_id"]:
-                    user_id = resp["user_id"]
-                if resp["draft_sequence"]:
-                    draft_sequence = resp["draft_sequence"]
-                if resp["hidden"]:
-                    hidden = resp["hidden"]
-                if resp["trust_level"]:
-                    trust_level = resp["trust_level"]
-                if resp["deleted_at"]:
-                    deleted_at = resp["deleted_at"]
-                if resp["user_deleted"]:
-                    user_deleted = resp["user_deleted"]
-                if resp["edit_reason"]:
-                    edit_reason = resp["edit_reason"]
-                if resp["can_view_edit_history"]:
-                    can_view_edit_history = resp["can_view_edit_history"]
-                if resp["wiki"]:
-                    wiki = resp["wiki"]
-                if resp["reviewable_id"]:
-                    reviewable_id = resp["reviewable_id"]
-                if resp["reviewable_score_count"]:
-                    reviewable_score_count = resp["reviewable_score_count"]
-                if resp["reviewable_score_pending_count"]:
-                    reviewable_score_pending_count = resp["reviewable_score_pending_count"]
-                if resp["mentioned_users"]:
-                    mentioned_users = resp["mentioned_users"]
-                    
-                new_discourse_post = DiscoursePost(post_id = post_id, 
-                                                   topic_id = topic_id, 
-                                                   topic_slug = topic_slug, 
-                                                   username = user.discourse_username, 
-                                                   created_at = created_at, 
-                                                   updated_at = updated_at, 
-                                                   cooked = cooked, 
-                                                   reply_count = reply_count, 
-                                                   reply_to_post_number = reply_to_post_number, 
-                                                   quote_count = quote_count, 
-                                                   incoming_link_count = incoming_link_count, 
-                                                   reads = reads, 
-                                                   readers_count = readers_count, 
-                                                   score = score, 
-                                                   yours = yours, 
-                                                   display_username = display_username, 
-                                                   primary_group_name = primary_group_name, 
-                                                   flair_name = flair_name, 
-                                                   flair_url = flair_url, 
-                                                   flair_bg_color = flair_bg_color, 
-                                                   flair_color = flair_color, 
-                                                   flair_group_id = flair_group_id, 
-                                                   version = version, 
-                                                   can_edit = can_edit, 
-                                                   can_delete = can_delete, 
-                                                   can_recover = can_recover,
-                                                   can_see_hidden_post = can_see_hidden_post, 
-                                                   can_wiki = can_wiki, 
-                                                   user_title = user_title, 
-                                                   bookmarked = bookmarked, 
-                                                   actions_summary = actions_summary, 
-                                                   moderator = moderator, 
-                                                   admin = admin, 
-                                                   staff = staff, 
-                                                   user_id = user_id, 
-                                                   draft_sequence = draft_sequence, 
-                                                   hidden = hidden, 
-                                                   trust_level = trust_level, 
-                                                   deleted_at = deleted_at, 
-                                                   user_deleted = user_deleted, 
-                                                   edit_reason = edit_reason, 
-                                                   can_view_edit_history = can_view_edit_history, 
-                                                   wiki = wiki, 
-                                                   reviewable_id = reviewable_id, 
-                                                   reviewable_score_count = reviewable_score_count, 
-                                                   reviewable_score_pending_count = reviewable_score_pending_count, 
-                                                   mentioned_users = mentioned_users)
-                db.session.add(new_discourse_post)
+                # if resp["topic_id"]:
+                #     topic_id = resp["topic_id"]
+                # if resp["topic_slug"]:
+                #     topic_slug = resp["topic_slug"]
+                # if resp["created_at"]:
+                #     created_at = resp["created_at"]
+                # if resp["updated_at"]:
+                #     updated_at = resp["updated_at"]
+                # if resp["cooked"]:
+                #     cooked = resp["cooked"]
+                # if resp["reply_count"]:
+                #     reply_count = resp["reply_count"]
+                # if resp["reply_to_post_number"]:
+                #     reply_to_post_number = resp["reply_to_post_number"]
+                # if resp["quote_count"]:
+                #     quote_count = resp["quote_count"]
+                # if resp["incoming_link_count"]:
+                #     incoming_link_count = resp["incoming_link_count"]
+                # if resp["reads"]:
+                #     reads = resp["reads"]
+                # if resp["readers_count"]:
+                #     readers_count = resp["readers_count"]
+                # if resp["score"]:
+                #     score = resp["score"]
+                # if resp["yours"]:
+                #     yours = resp["yours"]
+                # if resp["display_username"]:
+                #     display_username = resp["display_username"]
+                # if resp["primary_group_name"]:
+                #     primary_group_name = resp["primary_group_name"]
+                # if resp["flair_name"]:
+                #     flair_name = resp["flair_name"]
+                # if resp["flair_url"]:
+                #     flair_url = resp["flair_url"]
+                # if resp["flair_bg_color"]:
+                #     flair_bg_color = resp["flair_bg_color"]
+                # if resp["flair_color"]:
+                #     flair_color = resp["flair_color"]
+                # if resp["flair_group_id"]:
+                #     flair_group_id = resp["flair_group_id"]
+                # if resp["version"]:
+                #     version = resp["version"]
+                # if resp["can_edit"]:
+                #     can_edit = resp["can_edit"]
+                # if resp["can_delete"]:
+                #     can_delete = resp["can_delete"]
+                # if resp["can_recover"]:
+                #     can_recover = resp["can_recover"]
+                # if resp["can_see_hidden_post"]:
+                #     can_see_hidden_post = resp["can_see_hidden_post"]
+                # if resp["can_wiki"]:
+                #     can_wiki = resp["can_wiki"]
+                # if resp["user_title"]:
+                #     user_title = resp["user_title"]
+                # if resp["bookmarked"]:
+                #     bookmarked = resp["bookmarked"]
+                # if resp["actions_summary"]:
+                #     actions_summary = resp["actions_summary"]
+                # if resp["moderator"]:
+                #     moderator = resp["moderator"]
+                # if resp["admin"]:
+                #     admin = resp["admin"]
+                # if resp["staff"]:
+                #     staff = resp["staff"]
+                # if resp["user_id"]:
+                #     user_id = resp["user_id"]
+                # if resp["draft_sequence"]:
+                #     draft_sequence = resp["draft_sequence"]
+                # if resp["hidden"]:
+                #     hidden = resp["hidden"]
+                # if resp["trust_level"]:
+                #     trust_level = resp["trust_level"]
+                # if resp["deleted_at"]:
+                #     deleted_at = resp["deleted_at"]
+                # if resp["user_deleted"]:
+                #     user_deleted = resp["user_deleted"]
+                # if resp["edit_reason"]:
+                #     edit_reason = resp["edit_reason"]
+                # if resp["can_view_edit_history"]:
+                #     can_view_edit_history = resp["can_view_edit_history"]
+                # if resp["wiki"]:
+                #     wiki = resp["wiki"]
+                # if resp["reviewable_id"]:
+                #     reviewable_id = resp["reviewable_id"]
+                # if resp["reviewable_score_count"]:
+                #     reviewable_score_count = resp["reviewable_score_count"]
+                # if resp["reviewable_score_pending_count"]:
+                #     reviewable_score_pending_count = resp["reviewable_score_pending_count"]
+                # if resp["mentioned_users"]:
+                #     mentioned_users = resp["mentioned_users"]
+                # print("debug 22") 
+                # new_discourse_post = DiscoursePost(post_id = post_id, 
+                #                                    topic_id = topic_id, 
+                #                                    topic_slug = topic_slug, 
+                #                                    username = user.discourse_username, 
+                #                                    created_at = created_at, 
+                #                                    updated_at = updated_at, 
+                #                                    cooked = cooked, 
+                #                                    reply_count = reply_count, 
+                #                                    reply_to_post_number = reply_to_post_number, 
+                #                                    quote_count = quote_count, 
+                #                                    incoming_link_count = incoming_link_count, 
+                #                                    reads = reads, 
+                #                                    readers_count = readers_count, 
+                #                                    score = score, 
+                #                                    yours = yours, 
+                #                                    display_username = display_username, 
+                #                                    primary_group_name = primary_group_name, 
+                #                                    flair_name = flair_name, 
+                #                                    flair_url = flair_url, 
+                #                                    flair_bg_color = flair_bg_color, 
+                #                                    flair_color = flair_color, 
+                #                                    flair_group_id = flair_group_id, 
+                #                                    version = version, 
+                #                                    can_edit = can_edit, 
+                #                                    can_delete = can_delete, 
+                #                                    can_recover = can_recover,
+                #                                    can_see_hidden_post = can_see_hidden_post, 
+                #                                    can_wiki = can_wiki, 
+                #                                    user_title = user_title, 
+                #                                    bookmarked = bookmarked, 
+                #                                    actions_summary = actions_summary, 
+                #                                    moderator = moderator, 
+                #                                    admin = admin, 
+                #                                    staff = staff, 
+                #                                    user_id = user_id, 
+                #                                    draft_sequence = draft_sequence, 
+                #                                    hidden = hidden, 
+                #                                    trust_level = trust_level, 
+                #                                    deleted_at = deleted_at, 
+                #                                    user_deleted = user_deleted, 
+                #                                    edit_reason = edit_reason, 
+                #                                    can_view_edit_history = can_view_edit_history, 
+                #                                    wiki = wiki, 
+                #                                    reviewable_id = reviewable_id, 
+                #                                    reviewable_score_count = reviewable_score_count, 
+                #                                    reviewable_score_pending_count = reviewable_score_pending_count, 
+                #                                    mentioned_users = mentioned_users)
+                # db.session.add(new_discourse_post)
                 Ticket = Ticket.query.filter_by(ticket_id = ticket_id).first()
                 Ticket.discourse_post_id = post_id
                 db.session.commit()
-                
+                print("debug 24")
                 return jsonify({
                     "status": "success",
                     "message": "Post in Discourse created successfully."
                     }) 
             else:
+                print("debug 18")
                 # abort(422, message = "Post in Discourse could not be created.")
                 return jsonify({"status": "failed", "message": "Post in Discourse could not be created."}), request.status_code
         except:
+            print("debug 19")
             abort(404, message = "Discourse server not reachable.")
