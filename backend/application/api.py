@@ -1114,9 +1114,9 @@ class DiscoursePost(Resource):
             ticket_id = None
             title = None
             raw = None
-            category = 0
-            target_recipients = "system"
-            archetype = "private_message"
+            # category = 0
+            # target_recipients = "system"
+            # archetype = "private_message"
 
             if args["title"]:
                 print("debug 8")
@@ -1145,7 +1145,7 @@ class DiscoursePost(Resource):
             data = {
                 "title": title,
                 "raw": raw,              
-                "category": 4,
+                "category": 0,
                 "target_recipients": "system",
                 "archetype": "private_message"
             }
@@ -1153,7 +1153,7 @@ class DiscoursePost(Resource):
 
             print(json.dumps(data))      
             request1 = requests.post(url, json = data, headers = headers)
-            print(request1)
+            print(request1.content)
             print("debug 17")
             if request1.status_code == 200:
                 resp = request1.json() 
@@ -1207,9 +1207,10 @@ class DiscoursePost(Resource):
                 # reviewable_score_pending_count = None
                 # mentioned_users = None
                 # print("debug 21")
-                
+                print("debug 225")
                 if resp["id"]:
                     post_id = resp["id"]
+                    print("debug 34")
                 # if resp["topic_id"]:
                 #     topic_id = resp["topic_id"]
                 # if resp["topic_slug"]:
@@ -1349,8 +1350,12 @@ class DiscoursePost(Resource):
                 #                                    reviewable_score_pending_count = reviewable_score_pending_count, 
                 #                                    mentioned_users = mentioned_users)
                 # db.session.add(new_discourse_post)
-                Ticket = Ticket.query.filter_by(ticket_id = ticket_id).first()
-                Ticket.discourse_post_id = post_id
+                print("debug 202")
+                print(ticket_id)
+                ticket = Ticket.query.filter_by(ticket_id = ticket_id).first()
+                print("debug 2022")
+                ticket.discourse_post_id = post_id
+                print("debug 202222")
                 db.session.commit()
                 print("debug 24")
                 return jsonify({
